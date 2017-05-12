@@ -58,13 +58,21 @@ var Dolphin = function (opts) {
 
   var _this = this;
 
+  this.containers.create = function (params) {
+    return _this._post('containers/create', params, _this.opts);
+  }
+
+  this.containers.start = function (params) {
+    return _this._post('containers/' + params.Id + '/start', params, _this.opts);
+  }
+
   this.containers.inspect = function (id) {
     return _this._get('containers/' + id + '/json', null, _this.opts);
   }
 
   this.containers.logs = function (id) {
     // TODO: disable json parse
-    return _this._get('containers/' + id + '/logs', null, _this.opts);
+    return _this._get('containers/' + id + '/logs?follow=0&stdout=1&stderr=1&tail=all', null, _this.opts);
   }
 
   this.containers.changes = function (id) {
@@ -249,20 +257,21 @@ function buildUrl(url, path, query, isSocket) {
     url = url + '/' + path;
   }
   if (query) {
-    if(query.filters){
-      query.filters = filtersToJSON(query.filters);
-    }
+    // if(query.filters){
+    //   query.filters = filtersToJSON(query.filters);
+    // }
     url += '?' + querystring.stringify(query);
   }
   return url;
 }
 
 function filtersToJSON(filters){
+  var filtersResult = {};
   var keys = Object.keys(filters);
   keys.forEach(function(key){
-    filters[key] = [filters[key].toString()];
+    filtersResult[key] = filters[key].toString();
   })
-  return JSON.stringify(filters);
+  return JSON.stringify(filtersResult);
 }
 
 /**

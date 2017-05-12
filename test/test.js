@@ -36,7 +36,47 @@ dolphin.version().then(function(info){
 })
 */
 
-dolphin.containers({filters: '{"status":["running"]}'}).then(function(info){
-	console.log(info);
-	console.log(info[1].Ports);
+// console.log('dolphin.containers');
+// dolphin.containers({filters: '{"status":["running"]}'}).then(function(info){
+// 	console.log('containers list', info);
+// })
+
+console.log('dolphin.containers.create');
+dolphin.containers.create({
+		Image: 'kreativsoftware/vae-basic', 
+		Cmd: ['node', 'bin/www'], 
+		ExposedPorts: {'3000/tcp': {}},
+		AttachStdin: true,
+		AttachStdout: true,
+		AttachStderr: true,
+		Tty: true,
+		"Volumes": {
+			"/tmp/video": { }
+		},
+	}).then(function(info){
+	console.log('container created', info);
+	
+	dolphin.containers.start({
+			Id: info.Id,
+			"VolumeBindings": {
+				"/tmp/video": {
+					'bind': '/tmp/video',
+					'mode': 'rw',
+				}
+			},
+			"PortBindings": {
+				"3000/tcp": [
+					{
+						"HostIp": "0.0.0.0", // Strings, not numbers here
+						"HostPort": "3000"
+					}
+				]
+			}
+		}).then(function (startResult) {
+			console.log('start', startResult);
+			dolphin.containers.logs(info.Id).then(function (logs) {
+				console.log('logs', logs);
+			});
+	});
+
 })

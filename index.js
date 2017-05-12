@@ -62,8 +62,8 @@ var Dolphin = function (opts) {
     return _this._post('containers/create', params, _this.opts);
   }
 
-  this.containers.start = function (params) {
-    return _this._post('containers/' + params.Id + '/start', params, _this.opts);
+  this.containers.start = function (id) {
+    return _this._post('containers/' + id + '/start', null, _this.opts);
   }
 
   this.containers.inspect = function (id) {
